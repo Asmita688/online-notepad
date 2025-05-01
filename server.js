@@ -17,7 +17,11 @@ db.serialize(() => {
 });
 
 app.use(bodyParser.json());
-app.use(express.static('.')); // Serve index.html
+
+// ✅ Serve index.html when user visits "/"
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
 
 // Save note
 app.post('/save', (req, res) => {
@@ -47,6 +51,6 @@ app.get('/notes', (req, res) => {
     });
 });
 
-app.listen(PORT, () => {
-    console.log(`Server running at http://localhost:${PORT}`);
-});
+app.listen(PORT, () => 
+    console.log(`Server running at http://localhost:${PORT}`)
+);
