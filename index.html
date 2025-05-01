@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Online Notepad (SQLite)</title>
+    <style>
+        textarea {
+            width: 80%;
+            height: 200px;
+            font-size: 16px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        button {
+            font-size: 16px;
+            padding: 10px 20px;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            background: #f2f2f2;
+            margin-bottom: 5px;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Online Notepad</h1>
+    <textarea id="note" placeholder="Type your note here..."></textarea><br>
+    <button onclick="saveNote()">Save Note</button>
+
+    <p id="response"></p>
+
+    <h2>Saved Notes</h2>
+    <ul id="notesList"></ul>
+
+    <script>
+        function saveNote() {
+            let noteText = document.getElementById('note').value.trim();
+
+            if (noteText === "") {
+                document.getElementById('response').innerText = "Note is empty!";
+                return;
+            }
+
+            fetch('/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ note: noteText })
+            })
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('response').innerText = data;
+                document.getElementById('note').value = "";
+                loadNotes(); // Reload notes
+            });
+        }
+
+        function loadNotes() {
+            fetch('/notes')
+                .then(response => response.json())
+                .then(notes => {
+                    let notesList = document.getElementById('notesList');
+                    notesList.innerHTML = "";
+                    notes.forEach(note => {
+                        let li = document.createElement('li');
+                        li.textContent = note.content;
+                        notesList.appendChild(li);
+                    });
+                });
+        }
+
+        // Load notes when page loads
+        loadNotes();
+    </script>
+</body>
+</html>
